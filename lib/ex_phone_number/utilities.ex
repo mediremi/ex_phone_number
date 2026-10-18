@@ -20,11 +20,14 @@ defmodule ExPhoneNumber.Utilities do
 
   def matches_entirely?(nil, _string), do: false
 
-  def matches_entirely?(regex, string) when is_map(regex), do: matches_entirely?(regex.source, string)
+  # Keeps the compiled regex's options, e.g. :unicode, which make character
+  # classes match characters rather than bytes
+  def matches_entirely?(%Regex{} = regex, string),
+    do: match_entirely(Regex.compile!("^(?:" <> regex.source <> ")$", Regex.opts(regex)), string)
 
-  def matches_entirely?(regex, string) do
-    regex = ~r/^(?:#{regex})$/
+  def matches_entirely?(regex, string), do: match_entirely(~r/^(?:#{regex})$/, string)
 
+  defp match_entirely(regex, string) do
     case Regex.run(regex, string, return: :index) do
       [{_index, length} | _tail] -> Kernel.byte_size(string) == length
       _ -> false

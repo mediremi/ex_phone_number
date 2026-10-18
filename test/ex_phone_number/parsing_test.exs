@@ -586,6 +586,13 @@ defmodule ExPhoneNumber.ParsingTest do
     end
 
     context "Invalid numbers" do
+      # Character classes must match characters, not the bytes of a
+      # multibyte character
+      it "should return error with letters between the digits" do
+        assert {:error, ErrorMessages.not_a_number()} == parse("650\u00E42530000", RegionCodeFixture.us())
+        assert {:error, ErrorMessages.not_a_number()} == parse("650 \u00FC 253 0000", RegionCodeFixture.us())
+      end
+
       it "should match the error message #1" do
         {result, message} = parse("This is not a phone number", RegionCodeFixture.nz())
         assert :error == result
@@ -822,6 +829,12 @@ defmodule ExPhoneNumber.ParsingTest do
     end
 
     context "Number with extension" do
+      it "should match the phone number with a full-width extension label" do
+        {result, phone_number} = parse("650 253 0000 \uFF45\uFF58\uFF54 12", RegionCodeFixture.us())
+        assert :ok == result
+        assert %{PhoneNumberFixture.us_number() | extension: "12"} == phone_number
+      end
+
       it "should match the phone number #1" do
         {result, phone_number} = parse("03 331 6005 ext 3456", RegionCodeFixture.nz())
         assert :ok == result

@@ -18,6 +18,7 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 - Split numbers at byte offsets rather than grapheme offsets, so text with multibyte characters before the number, an extension, a second number or an ISDN subaddress no longer drops or adds digits (e.g. "Tél. 650 253 0000" parsed as 502530000)
 - Don't strip a national prefix when that would leave a number that's only possible when dialling locally, as libphonenumber does (e.g. "0123456" in GB keeps its 0)
 - Count leading zeros as libphonenumber does, so a number with several leading zeros that ends in 0 keeps them all (e.g. "0010" in AU)
+- Keep a compiled pattern's options when matching a whole string, so Unicode patterns match characters rather than bytes: letters between the digits make a number invalid (e.g. "650ä2530000"), and full-width extension labels are recognised (e.g. "650 253 0000 ｅｘｔ 12")
 
 ## [0.4.11] - 2026-03-18
 
