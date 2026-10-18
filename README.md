@@ -12,6 +12,41 @@ Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber)
 
 **Current metadata version: v9.0.41.**
 
+## This fork
+
+This `fixes` branch is upstream's `master` with fixes that make it agree with
+libphonenumber, each its own commit with a CHANGELOG entry and, for bugs, a
+regression test. Compared against libphonenumber, 0.4.11:
+
+- never strips national prefixes in Argentina and Brazil, so `011 15
+  2345-6789` in Argentina isn't `+54 9 11 2345 6789` but an invalid number
+- drops or adds digits when a non-ASCII character comes before the number,
+  as in `Teléfono: 222 123 4567`, giving a different, sometimes valid, number
+- accepts letters between the digits (`650ä2530000`), and doesn't recognise
+  full-width extension labels (`ｅｘｔ 12`)
+- strips national prefixes that leave only a local number, and miscounts some
+  leading zeros
+
+With these fixes it gives the same E.164 number, validity and extension as
+libphonenumber 9.0.41 for every region's example numbers in the formats people
+write them, and for about 50,000 random inputs with labels, separators,
+different scripts' digits and extensions. These differences remain:
+
+- Only ASCII, full-width, Arabic-Indic and Persian digits are read, where
+  libphonenumber reads any script's digits (e.g. Devanagari).
+- Extensions are at most 7 digits, with the labels of older libphonenumber
+  releases (so not e.g. "доб").
+- Parsing with the raw input kept (`Parsing.parse_helper/4`, not public)
+  records carrier codes and the country code's source differently.
+- Tristan da Cunha's numbers are `:fixed_line_or_mobile` rather than
+  `:fixed_line`.
+
+To use it:
+
+```elixir
+{:ex_phone_number, github: "mediremi/ex_phone_number", branch: "fixes"}
+```
+
 ## Installation
 
 Add `:ex_phone_number` to your list of dependencies in `mix.exs`:
