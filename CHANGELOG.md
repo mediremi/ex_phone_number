@@ -7,6 +7,10 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+### Changed
+
+- Updated metadata source file to v9.0.41
+
 ### Fixed
 
 - Strip the whitespace from `nationalPrefixForParsing`, so national prefixes are removed from AR and BR numbers (e.g. "011 15 2345-6789" in AR is +54 9 11 2345-6789)
