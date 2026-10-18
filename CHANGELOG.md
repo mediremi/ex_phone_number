@@ -17,6 +17,7 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 - Strip the whitespace from `nationalPrefixForParsing`, so national prefixes are removed from AR and BR numbers (e.g. "011 15 2345-6789" in AR is +54 9 11 2345-6789)
 - Split numbers at byte offsets rather than grapheme offsets, so text with multibyte characters before the number, an extension, a second number or an ISDN subaddress no longer drops or adds digits (e.g. "Tél. 650 253 0000" parsed as 502530000)
 - Don't strip a national prefix when that would leave a number that's only possible when dialling locally, as libphonenumber does (e.g. "0123456" in GB keeps its 0)
+- Count leading zeros as libphonenumber does, so a number with several leading zeros that ends in 0 keeps them all (e.g. "0010" in AU)
 
 ## [0.4.11] - 2026-03-18
 

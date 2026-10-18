@@ -1012,6 +1012,19 @@ defmodule ExPhoneNumber.ParsingTest do
         assert :ok == result
         assert PhoneNumberFixture.au_leading_zero4() == phone_number
       end
+
+      # Only a number that's all 0s has its last 0 not counted
+      it "should match the phone number #5" do
+        {result, phone_number} = parse("0010", RegionCodeFixture.au())
+        assert :ok == result
+
+        assert %PhoneNumber{
+                 country_code: 61,
+                 national_number: 10,
+                 italian_leading_zero: true,
+                 number_of_leading_zeros: 2
+               } == phone_number
+      end
     end
   end
 end

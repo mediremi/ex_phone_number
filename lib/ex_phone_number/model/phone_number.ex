@@ -94,15 +94,14 @@ defmodule ExPhoneNumber.Model.PhoneNumber do
     if String.length(national_number) > 1 and String.at(national_number, 0) == "0" do
       phone_number = %{phone_number | italian_leading_zero: true}
 
+      # As in libphonenumber, if the number is all 0s, the last 0 isn't
+      # counted as a leading zero
       number_of_leading_zeros =
-        Enum.reduce_while(String.graphemes(national_number), 0, fn ele, acc ->
-          if ele == "0", do: {:cont, acc + 1}, else: {:halt, acc}
-        end)
-
-      number_of_leading_zeros =
-        if String.ends_with?(national_number, "0"),
-          do: number_of_leading_zeros - 1,
-          else: number_of_leading_zeros
+        national_number
+        |> String.slice(0..-2//1)
+        |> String.graphemes()
+        |> Enum.take_while(&(&1 == "0"))
+        |> length()
 
       if number_of_leading_zeros > 1,
         do: %{phone_number | number_of_leading_zeros: number_of_leading_zeros},
