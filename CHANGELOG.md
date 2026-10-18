@@ -10,6 +10,7 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Strip the whitespace from `nationalPrefixForParsing`, so national prefixes are removed from AR and BR numbers (e.g. "011 15 2345-6789" in AR is +54 9 11 2345-6789)
+- Split numbers at byte offsets rather than grapheme offsets, so text with multibyte characters before the number, an extension, a second number or an ISDN subaddress no longer drops or adds digits (e.g. "Tél. 650 253 0000" parsed as 502530000)
 
 ## [0.4.11] - 2026-03-18
 

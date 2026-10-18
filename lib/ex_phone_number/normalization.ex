@@ -58,8 +58,7 @@ defmodule ExPhoneNumber.Normalization do
       when is_binary(string) and is_map(pattern) do
     case Regex.run(pattern, string, return: :index) do
       [{index, _length} | _tail] ->
-        {head, _tail} = String.split_at(string, index)
-        head
+        binary_part(string, 0, index)
 
       nil ->
         string
@@ -70,8 +69,7 @@ defmodule ExPhoneNumber.Normalization do
       when is_binary(string) and is_binary(pattern) do
     case :binary.match(string, pattern) do
       {pos, _length} ->
-        {head, _tail} = String.split_at(string, pos)
-        head
+        binary_part(string, 0, pos)
 
       :nomatch ->
         string

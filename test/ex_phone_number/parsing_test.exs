@@ -531,6 +531,37 @@ defmodule ExPhoneNumber.ParsingTest do
         assert :ok == result
         assert PhoneNumberFixture.us_number() == phone_number
       end
+
+      # Regex matches give byte offsets, so text with multibyte characters
+      # must be split by bytes, not by graphemes
+      it "should return correct value with multibyte characters before the number" do
+        assert {:ok, PhoneNumberFixture.us_number()} == parse("T\u00E9l. 650 253 0000", RegionCodeFixture.us())
+        assert {:ok, PhoneNumberFixture.us_number()} == parse("\u2116 650 253 0000", RegionCodeFixture.us())
+      end
+
+      it "should return correct value with multibyte digits before an extension" do
+        {result, phone_number} =
+          parse("\uFF16\uFF15\uFF10 \uFF12\uFF15\uFF13 \uFF10\uFF10\uFF10\uFF10 ext. 1234", RegionCodeFixture.us())
+
+        assert :ok == result
+        assert %{PhoneNumberFixture.us_number() | extension: "1234"} == phone_number
+      end
+
+      it "should return correct value with multibyte digits before a second number" do
+        {result, phone_number} =
+          parse("\uFF16\uFF15\uFF10 \uFF12\uFF15\uFF13 \uFF10\uFF10\uFF10\uFF10 / x 123", RegionCodeFixture.us())
+
+        assert :ok == result
+        assert PhoneNumberFixture.us_number() == phone_number
+      end
+
+      it "should return correct value with multibyte digits before an ISDN subaddress" do
+        {result, phone_number} =
+          parse("tel:\uFF16\uFF15\uFF10-\uFF12\uFF15\uFF13-\uFF10\uFF10\uFF10\uFF10;isub=12345", RegionCodeFixture.us())
+
+        assert :ok == result
+        assert PhoneNumberFixture.us_number() == phone_number
+      end
     end
 
     context "With Leading Zero" do

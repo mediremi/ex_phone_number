@@ -44,9 +44,8 @@ defmodule ExPhoneNumber.Extraction do
   def extract_possible_number(number_to_parse) do
     case Regex.run(Patterns.valid_start_char_pattern(), number_to_parse, return: :index) do
       [{index, _length} | _tail] ->
-        {_head, tail} = String.split_at(number_to_parse, index)
-
-        tail
+        number_to_parse
+        |> binary_part(index, byte_size(number_to_parse) - index)
         |> split_at_match_and_return_head(Patterns.unwanted_end_char_pattern())
         |> split_at_match_and_return_head(Patterns.second_number_start_pattern())
 
@@ -125,7 +124,7 @@ defmodule ExPhoneNumber.Extraction do
   def maybe_strip_extension(number) do
     case Regex.run(Patterns.extn_pattern(), number, return: :index) do
       [{index, _} | tail] ->
-        {phone_number_head, _} = String.split_at(number, index)
+        phone_number_head = binary_part(number, 0, index)
 
         if is_viable_phone_number?(phone_number_head) do
           {match_index, match_length} =
