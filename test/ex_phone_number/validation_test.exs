@@ -68,8 +68,8 @@ defmodule ExPhoneNumber.ValidationTest do
 
     context "US local number" do
       it "should return correct value" do
-        assert ValidationResults.is_possible() ==
-                 is_possible_number_with_reason?(PhoneNumberFixture.us_number())
+        assert ValidationResults.is_possible_local_only() ==
+                 is_possible_number_with_reason?(PhoneNumberFixture.us_local_number())
       end
     end
 

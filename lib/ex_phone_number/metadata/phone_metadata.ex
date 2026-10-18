@@ -110,7 +110,16 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
     kwlist =
       if(is_map(kwlist) && is_map(kwlist.general)) do
-        put_in(kwlist.general.possible_lengths, general_possible_lengths(kwlist))
+        possible_lengths = general_lengths(kwlist, :possible_lengths)
+
+        # As in libphonenumber, a length that's possible nationally for one
+        # type isn't local only for the region
+        local_only_lengths = general_lengths(kwlist, :local_only_lengths) -- possible_lengths
+
+        %{
+          kwlist
+          | general: %{kwlist.general | possible_lengths: possible_lengths, local_only_lengths: local_only_lengths}
+        }
       else
         kwlist
       end
@@ -118,7 +127,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     struct(%PhoneMetadata{}, kwlist)
   end
 
-  defp general_possible_lengths(kwlist) do
+  defp general_lengths(kwlist, key) do
     [
       :fixed_line,
       :mobile,
@@ -133,19 +142,15 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       :no_international_dialing
     ]
     |> Enum.flat_map(fn type ->
-      kwlist
-      |> Map.get(type)
-      |> get_possible_length()
+      case Map.get(kwlist, type) do
+        nil -> []
+        description -> Map.fetch!(description, key) || []
+      end
     end)
     |> Enum.reject(&is_nil/1)
     |> Enum.sort()
     |> Enum.uniq()
   end
-
-  defp get_possible_length(nil), do: []
-
-  defp get_possible_length(phone_number_description = %PhoneNumberDescription{}),
-    do: phone_number_description.possible_lengths || []
 
   defp normalize_rule(nil), do: nil
 
@@ -576,6 +581,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     %PhoneNumberDescription{
       national_number_pattern: national_number_pattern,
       possible_lengths: possible_lengths,
+      local_only_lengths: description.local_only_lengths,
       example_number: example_number
     }
   end

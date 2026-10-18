@@ -3,6 +3,8 @@ defmodule ExPhoneNumber.Constants.ValidationResults do
 
   def is_possible(), do: :is_possible
 
+  def is_possible_local_only(), do: :is_possible_local_only
+
   def invalid_country_code(), do: :invalid_country_code
 
   def too_short(), do: :too_short

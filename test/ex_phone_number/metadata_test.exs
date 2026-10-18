@@ -76,7 +76,11 @@ defmodule ExPhoneNumber.MetadataTest do
       end
 
       it "returns valid general.possible_lengths", state do
-        assert [7, 10] == state[:us_metadata].general.possible_lengths
+        assert [10] == state[:us_metadata].general.possible_lengths
+      end
+
+      it "returns valid general.local_only_lengths", state do
+        assert [7] == state[:us_metadata].general.local_only_lengths
       end
 
       it "returns valid toll_free.possible_lengths", state do
@@ -147,7 +151,11 @@ defmodule ExPhoneNumber.MetadataTest do
       end
 
       it "returns valid fixed_line.possible_lengths", state do
-        assert Enum.to_list(2..11) == state[:de_metadata].fixed_line.possible_lengths
+        assert Enum.to_list(4..11) == state[:de_metadata].fixed_line.possible_lengths
+      end
+
+      it "returns valid fixed_line.local_only_lengths", state do
+        assert [2, 3] == state[:de_metadata].fixed_line.local_only_lengths
       end
 
       it "returns valid fixed_line.example_number", state do

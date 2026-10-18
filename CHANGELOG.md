@@ -10,11 +10,13 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Updated metadata source file to v9.0.41
+- `PhoneNumberDescription.possible_lengths` no longer includes the lengths that are only possible when dialling locally, which are in the new `local_only_lengths`, and `Validation.is_possible_number_with_reason?/1` returns `:is_possible_local_only` for those lengths. `is_possible_number?/1` still accepts them.
 
 ### Fixed
 
 - Strip the whitespace from `nationalPrefixForParsing`, so national prefixes are removed from AR and BR numbers (e.g. "011 15 2345-6789" in AR is +54 9 11 2345-6789)
 - Split numbers at byte offsets rather than grapheme offsets, so text with multibyte characters before the number, an extension, a second number or an ISDN subaddress no longer drops or adds digits (e.g. "Tél. 650 253 0000" parsed as 502530000)
+- Don't strip a national prefix when that would leave a number that's only possible when dialling locally, as libphonenumber does (e.g. "0123456" in GB keeps its 0)
 
 ## [0.4.11] - 2026-03-18
 

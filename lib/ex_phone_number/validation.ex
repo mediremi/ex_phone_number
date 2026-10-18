@@ -80,7 +80,10 @@ defmodule ExPhoneNumber.Validation do
   end
 
   def is_possible_number?(%PhoneNumber{} = number) do
-    ValidationResults.is_possible() == is_possible_number_with_reason?(number)
+    is_possible_number_with_reason?(number) in [
+      ValidationResults.is_possible(),
+      ValidationResults.is_possible_local_only()
+    ]
   end
 
   def is_possible_number_with_reason?(%PhoneNumber{} = number) do
@@ -98,6 +101,7 @@ defmodule ExPhoneNumber.Validation do
     !Enum.member?(
       [
         ValidationResults.too_short(),
+        ValidationResults.is_possible_local_only(),
         ValidationResults.invalid_length()
       ],
       test_number_length(number, metadata)
@@ -140,24 +144,15 @@ defmodule ExPhoneNumber.Validation do
 
     min_length = Enum.min(possible_lengths)
     max_length = Enum.max(possible_lengths)
+    actual_length = String.length(number)
 
-    if min_length == -1 do
-      ValidationResults.invalid_length()
-    else
-      case String.length(number) do
-        actual_length when actual_length < min_length ->
-          ValidationResults.too_short()
-
-        actual_length when actual_length > max_length ->
-          ValidationResults.too_long()
-
-        actual_length ->
-          if Enum.member?(possible_lengths, actual_length) do
-            ValidationResults.is_possible()
-          else
-            ValidationResults.invalid_length()
-          end
-      end
+    cond do
+      min_length == -1 -> ValidationResults.invalid_length()
+      actual_length in metadata.general.local_only_lengths -> ValidationResults.is_possible_local_only()
+      actual_length < min_length -> ValidationResults.too_short()
+      actual_length > max_length -> ValidationResults.too_long()
+      actual_length in possible_lengths -> ValidationResults.is_possible()
+      true -> ValidationResults.invalid_length()
     end
   end
 

@@ -4,6 +4,9 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   defstruct national_number_pattern: nil,
             # list
             possible_lengths: nil,
+            # list: lengths that are only possible when dialling locally,
+            # e.g. without an area code
+            local_only_lengths: [],
             # string
             example_number: nil
 
@@ -22,15 +25,10 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
         example_number: ~x"./exampleNumber/text()"o |> transform_by(&normalize_string/1)
       )
 
-    possible_lengths =
-      (kwlist.local_possible_lengths || [])
-      |> Enum.concat(kwlist.national_possible_lengths || [])
-      |> Enum.sort()
-      |> Enum.uniq()
-
     struct(%PhoneNumberDescription{}, %{
       national_number_pattern: kwlist.national_number_pattern,
-      possible_lengths: possible_lengths,
+      possible_lengths: Enum.sort(Enum.uniq(kwlist.national_possible_lengths || [])),
+      local_only_lengths: Enum.sort(Enum.uniq(kwlist.local_possible_lengths || [])),
       example_number: kwlist.example_number
     })
   end

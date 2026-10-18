@@ -4,6 +4,7 @@ defmodule ExPhoneNumber.ParsingTest do
   doctest ExPhoneNumber.Parsing
   import ExPhoneNumber.Parsing
   alias ExPhoneNumber.Constants.ErrorMessages
+  alias ExPhoneNumber.Model.PhoneNumber
   alias PhoneNumberFixture
 
   describe ".is_possible_number?/2" do
@@ -781,6 +782,16 @@ defmodule ExPhoneNumber.ParsingTest do
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
+      end
+    end
+
+    context "Local only if national prefix stripped" do
+      # In the test metadata, GB numbers are 9 or 10 digits, or 6 to 8 when
+      # dialled locally
+      it "should keep the national prefix" do
+        {result, phone_number} = parse("0123456", RegionCodeFixture.gb())
+        assert :ok == result
+        assert %PhoneNumber{country_code: 44, national_number: 123_456, italian_leading_zero: true} == phone_number
       end
     end
 
