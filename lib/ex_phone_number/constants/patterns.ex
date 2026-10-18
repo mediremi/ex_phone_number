@@ -3,10 +3,6 @@ defmodule ExPhoneNumber.Constants.Patterns do
 
   alias ExPhoneNumber.Constants.Values
 
-  def unique_international_prefix() do
-    Regex.compile("[\d]+(?:[~\u2053\u223C\uFF5E][\d]+)?")
-  end
-
   def valid_punctuation() do
     "-x\u2010-\u2015\u2212\u30FC\uFF0D-\uFF0F \u00A0\u00AD\u200B\u2060\u3000" <>
       "()\uFF08\uFF09\uFF3B\uFF3D.\\[\\]/~\u2053\u223C\uFF5E"
