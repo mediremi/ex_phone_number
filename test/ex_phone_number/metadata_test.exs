@@ -8,6 +8,34 @@ defmodule ExPhoneNumber.MetadataTest do
   alias PhoneNumberFixture
   alias RegionCodeFixture
 
+  describe ".from_xpath_node/1" do
+    context "nationalPrefixForParsing written over several lines" do
+      # libphonenumber's metadata spreads long patterns, such as AR's and BR's,
+      # over several lines. The whitespace isn't part of the pattern. The test
+      # metadata writes these on one line, so this loads a territory directly.
+      it "removes the whitespace" do
+        metadata =
+          """
+          <territory id="AR" countryCode="54" internationalPrefix="00" nationalPrefix="0"
+                     nationalPrefixForParsing="
+                       0?(?:
+                         (
+                           11|
+                           343
+                         )15
+                       )?"
+                     nationalPrefixTransformRule="9$1">
+            <generalDesc><nationalNumberPattern>\\d{10}</nationalNumberPattern></generalDesc>
+          </territory>
+          """
+          |> SweetXml.parse()
+          |> PhoneMetadata.from_xpath_node()
+
+        assert "0?(?:(11|343)15)?" == metadata.national_prefix_for_parsing
+      end
+    end
+  end
+
   describe ".get_for_region_code/1" do
     context "US region_code" do
       setup do
