@@ -34,6 +34,7 @@ defmodule ExPhoneNumber do
   alias ExPhoneNumber.Parsing
   alias ExPhoneNumber.Validation
   alias ExPhoneNumber.Metadata
+  alias ExPhoneNumber.TimeZones
 
   def format(%ExPhoneNumber.Model.PhoneNumber{} = phone_number, phone_number_format)
       when is_atom(phone_number_format),
@@ -41,6 +42,24 @@ defmodule ExPhoneNumber do
 
   def get_number_type(%ExPhoneNumber.Model.PhoneNumber{} = phone_number),
     do: Validation.get_number_type(phone_number)
+
+  @doc """
+  Returns the time zones a phone number is likely to be in, from the time
+  zones of the longest prefix of its country code and national significant
+  number in libphonenumber's table, as libphonenumber's
+  `PhoneNumberToTimeZonesMapper` does. Several time zones mean the prefix
+  covers all of them, such as a country code alone; `["Etc/Unknown"]` means
+  no prefix matched.
+
+  The time zones are CLDR's canonical IDs, some of which are links in the
+  IANA time zone database (e.g. "Asia/Calcutta" for "Asia/Kolkata").
+
+      iex> {:ok, phone_number} = ExPhoneNumber.parse("+1 650 253 0000", nil)
+      iex> ExPhoneNumber.get_time_zones_for_number(phone_number)
+      ["America/Los_Angeles"]
+  """
+  def get_time_zones_for_number(%ExPhoneNumber.Model.PhoneNumber{} = phone_number),
+    do: TimeZones.get_time_zones_for_number(phone_number)
 
   def is_possible_number?(%ExPhoneNumber.Model.PhoneNumber{} = phone_number),
     do: Validation.is_possible_number?(phone_number)

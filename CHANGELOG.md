@@ -7,6 +7,10 @@ and this project aims to adhere to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+### Added
+
+- `ExPhoneNumber.get_time_zones_for_number/1`, which returns the time zones of a number's longest prefix in libphonenumber's time zones table (`resources/timezones/map_data.txt`), as libphonenumber's `PhoneNumberToTimeZonesMapper` does, or `["Etc/Unknown"]`
+
 ### Changed
 
 - Updated metadata source file to v9.0.41

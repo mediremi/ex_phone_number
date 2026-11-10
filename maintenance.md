@@ -4,7 +4,8 @@ This document outlines the maintenance procedures for the ExPhoneNumber library.
 
 ## Update metadata
 
-- `mix update_metadata`
+- `mix update_metadata`, which downloads the latest release's metadata and
+  time zones table (`resources/timezones/map_data.txt`)
 - update [CHANGELOG.md](CHANGELOG.md)
 - commit as "Update metadata to <libphonenumber version>"
 

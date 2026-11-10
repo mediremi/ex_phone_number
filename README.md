@@ -41,6 +41,9 @@ different scripts' digits and extensions. These differences remain:
 - Tristan da Cunha's numbers are `:fixed_line_or_mobile` rather than
   `:fixed_line`.
 
+It also has `get_time_zones_for_number/1`, from libphonenumber's
+`PhoneNumberToTimeZonesMapper` (see "Time zones" below).
+
 To use it:
 
 ```elixir
@@ -96,6 +99,32 @@ iex> ExPhoneNumber.format(phone_number, :e164)
 iex> ExPhoneNumber.format(phone_number, :rfc3966)
 "tel:+41-44-668-18-00"
 ```
+
+## Time zones
+
+`ExPhoneNumber.get_time_zones_for_number/1` returns the time zones of the
+longest prefix of a number (its country code and national significant number)
+in libphonenumber's [time zones table](https://github.com/google/libphonenumber/blob/master/resources/timezones/map_data.txt),
+as libphonenumber's `PhoneNumberToTimeZonesMapper` does. A prefix can have
+several time zones, such as a country code alone, and a number that matches
+none gets `["Etc/Unknown"]`. Unlike libphonenumber's `getTimeZonesForNumber`,
+it doesn't check the number's type first, so a number that isn't valid still
+gets the time zones of the longest prefix it starts with.
+
+```elixir
+iex> {:ok, phone_number} = ExPhoneNumber.parse("+52 664 123 4567", nil)
+iex> ExPhoneNumber.get_time_zones_for_number(phone_number)
+["America/Tijuana"]
+
+iex> {:ok, phone_number} = ExPhoneNumber.parse("+1 208 200 0000", nil)
+iex> ExPhoneNumber.get_time_zones_for_number(phone_number)
+["America/Boise", "America/Los_Angeles"]
+```
+
+The time zones are CLDR's canonical IDs, some of which are links in the IANA
+time zone database (e.g. `Asia/Calcutta` for `Asia/Kolkata`). The table comes
+from the same libphonenumber release as the metadata, and like it is licensed
+under the Apache License 2.0.
 
 ## E164 Formatted Numbers
 

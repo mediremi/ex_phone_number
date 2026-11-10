@@ -1,6 +1,6 @@
 if Code.ensure_loaded?(Req) do
   defmodule Mix.Tasks.UpdateMetadata do
-    @moduledoc "Downloads the latest libphonenumber metadata from GitHub"
+    @moduledoc "Downloads the latest libphonenumber metadata and time zones table from GitHub"
     @shortdoc "Update libphonenumber metadata"
 
     use Mix.Task
@@ -9,9 +9,9 @@ if Code.ensure_loaded?(Req) do
     @raw_files_url "https://raw.githubusercontent.com/google/libphonenumber"
     @files_to_download [
       "resources/PhoneNumberMetadata.xml",
-      "resources/PhoneNumberMetadataForTesting.xml"
+      "resources/PhoneNumberMetadataForTesting.xml",
+      "resources/timezones/map_data.txt"
     ]
-    @resources_directory "resources"
 
     @impl Mix.Task
     def run(_args) do
@@ -29,8 +29,7 @@ if Code.ensure_loaded?(Req) do
     end
 
     defp download(tag, path) do
-      filename = Path.basename(path)
-      local_path = Path.join([File.cwd!(), @resources_directory, filename])
+      local_path = Path.join(File.cwd!(), path)
       file_url = "#{@raw_files_url}/#{tag}/#{path}"
       %{status: 200, body: body} = Req.get!(req(), url: file_url)
       File.write!(local_path, body)
